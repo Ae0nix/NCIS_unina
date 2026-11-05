@@ -1,0 +1,12 @@
+== modalita': service ==
+Raggiungibilita' totale: ok
+video da solo          video: 8.36 Mbps   TCP: -
+  coda slice bassa svuotata dopo 0 s
+TCP normale da solo    video: -   TCP: 0.90 Mbps
+  coda slice bassa svuotata dopo 0 s
+video + TCP insieme    video: 8.39 Mbps   TCP: 0.96 Mbps
+  video da solo vicino agli 8 Mbps offerti                     ok
+  TCP da solo limitato dalla slice bassa (0.5-1.3 Mbps)        ok
+  video con il TCP: nessun calo (>= 7 Mbps)                    ok
+  TCP con il video: resta sulla slice bassa (0.5-1.3 Mbps)     ok
+ESITO: ok

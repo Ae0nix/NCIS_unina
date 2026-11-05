@@ -1,0 +1,8 @@
+Attacco ip link (cambio MAC dell'interfaccia)
+  h1 (legittimo)  byte arrivati a h3: 375000
+  h2 (MAC di h1)  byte arrivati a h3: 625000
+  ESITO: attacco NON bloccato
+Attacco Scapy (frame contraffatti)
+  h1 (legittimo)  byte arrivati a h3: 375000
+  h2 (MAC di h1)  byte arrivati a h3: 370000
+  ESITO: attacco NON bloccato

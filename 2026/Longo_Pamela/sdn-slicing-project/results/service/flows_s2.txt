@@ -1,0 +1,5 @@
+OFPST_FLOW reply (OF1.3) (xid=0x2):
+ cookie=0x1, duration=3.945s, table=0, n_packets=2549, n_bytes=3854088, idle_timeout=10, priority=10,udp,in_port=1,dl_src=00:00:00:00:00:01,dl_dst=00:00:00:00:00:03,tp_dst=9999 actions=set_queue:1,output:2
+ cookie=0x4, duration=54.706s, table=0, n_packets=20, n_bytes=2604, priority=5,in_port=1 actions=output:2
+ cookie=0x4, duration=54.706s, table=0, n_packets=21, n_bytes=2694, priority=5,in_port=2 actions=output:1
+ cookie=0x0, duration=54.706s, table=0, n_packets=0, n_bytes=0, priority=0 actions=CONTROLLER:65535

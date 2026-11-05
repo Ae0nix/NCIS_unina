@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard slicing SDN</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#101828; --mute:#667085; --line:#e4e7ec;
+          --up:#1d5fa8; --low:#c2410c; --ok:#1e7b45; --bad:#b42318; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1218; --card:#181d26; --ink:#eef1f6; --mute:#98a2b3; --line:#2a313d;
+            --up:#6aa6ec; --low:#f08a52; --ok:#52c27f; --bad:#f2786b; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; }
+  main { max-width:1000px; margin:0 auto; padding:20px 16px 40px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--mute); margin:0 0 18px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .card h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--mute);
+             margin:0 0 6px; font-weight:600; }
+  .big { font-size:22px; font-weight:700; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; font-weight:600; }
+  .on  { background:color-mix(in srgb,var(--ok) 18%,transparent); color:var(--ok); }
+  .off { background:color-mix(in srgb,var(--mute) 18%,transparent); color:var(--mute); }
+  section { margin-top:16px; }
+  canvas { width:100%; height:240px; display:block; }
+  .legend { display:flex; gap:18px; font-size:13px; color:var(--mute); margin-top:6px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; }
+  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; margin-top:6px; }
+  .bar > i { display:block; height:100%; background:var(--up); }
+  .bar.low > i { background:var(--low); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  td,th { text-align:left; padding:6px 4px; border-bottom:1px solid var(--line); }
+  th { color:var(--mute); font-weight:600; font-size:12px; text-transform:uppercase; }
+  .k-spoof { color:var(--bad); font-weight:600; } .k-acl { color:var(--low); font-weight:600; }
+  .k-dinamico { color:var(--up); font-weight:600; }
+  #wait { display:none; padding:12px; border:1px dashed var(--line); border-radius:8px; color:var(--mute); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dashboard slicing SDN</h1>
+  <p class="sub">Dati dal controller Ryu, aggiornati ogni secondo.</p>
+  <div id="wait">In attesa del controller (nessun dato in logs/state.json).</div>
+
+  <div class="grid" id="cards">
+    <div class="card"><h2>Modalita'</h2><div class="big" id="mode">-</div></div>
+    <div class="card"><h2>Slice video (alta)</h2><div id="video"><span class="pill off">libera</span></div></div>
+    <div class="card"><h2>Anti-spoofing</h2><div class="big" id="spoofmode">-</div>
+      <div class="sub" style="margin:0" id="spoofcnt"></div></div>
+    <div class="card"><h2>Flussi installati</h2><div class="big" id="flows">0</div>
+      <div class="sub" style="margin:0" id="acl"></div></div>
+  </div>
+
+  <section class="card">
+    <h2>Traffico sulle due slice (Mbps)</h2>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--up)"></i>slice alta (10 Mbps)</span>
+      <span><i class="dot" style="background:var(--low)"></i>slice bassa (1 Mbps)</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Link di core</h2>
+    <table><thead><tr><th>Link</th><th>Slice</th><th>Mbps</th><th style="width:35%">Uso</th></tr></thead>
+    <tbody id="links"></tbody></table>
+  </section>
+
+  <section class="card">
+    <h2>Flussi attivi (dai contatori OpenFlow dello switch di ingresso)</h2>
+    <table><thead><tr><th>Flusso</th><th>Proto</th><th>Classe</th><th>Slice</th><th>Coda</th>
+      <th>Mbps</th><th>Pacchetti</th><th>Durata</th></tr></thead>
+    <tbody id="flows_tbl"><tr><td colspan="8" style="color:var(--mute)">nessun flusso</td></tr></tbody></table>
+  </section>
+
+  <section class="card">
+    <h2>Eventi</h2>
+    <table><thead><tr><th>Ora</th><th>Tipo</th><th>Dettaglio</th></tr></thead>
+    <tbody id="events"><tr><td colspan="3" style="color:var(--mute)">nessun evento</td></tr></tbody></table>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mbps = b => (b / 1e6).toFixed(2);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let last = null;
+
+function draw(hist) {
+  const cv = $('chart'), dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const padL = 40, padB = 22, padT = 8, padR = 8;
+  const maxV = Math.max(11e6, ...hist.map(p => Math.max(p.upper, p.lower)));
+  const X = i => padL + (hist.length <= 1 ? 0 : i * (w - padL - padR) / (hist.length - 1));
+  const Y = v => padT + (h - padT - padB) * (1 - v / maxV);
+  g.font = '12px system-ui'; g.fillStyle = css('--mute'); g.strokeStyle = css('--line');
+  for (let k = 0; k <= 4; k++) {
+    const v = maxV * k / 4, y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(w - padR, y); g.stroke();
+    g.fillText((v / 1e6).toFixed(0), 6, y + 4);
+  }
+  [['upper', '--up'], ['lower', '--low']].forEach(([key, col]) => {
+    g.strokeStyle = css(col); g.lineWidth = 2; g.beginPath();
+    hist.forEach((p, i) => i ? g.lineTo(X(i), Y(p[key])) : g.moveTo(X(i), Y(p[key])));
+    g.stroke();
+  });
+  if (hist.length > 1) {
+    const secs = Math.round(hist[hist.length - 1].t - hist[0].t);
+    g.fillStyle = css('--mute'); g.fillText('ultimi ' + secs + ' s', padL, h - 4);
+  }
+}
+
+function render(s) {
+  $('wait').style.display = s.waiting ? 'block' : 'none';
+  if (s.waiting) return;
+  $('mode').textContent = s.mode;
+  $('video').innerHTML = s.mode === 'dynamic'
+    ? (s.video_active ? '<span class="pill on">video in uso</span>' : '<span class="pill off">libera: presta banda</span>')
+    : '<span class="pill off">non dinamico</span>';
+  $('spoofmode').textContent = s.spoof_mode;
+  $('spoofcnt').textContent = s.counters.spoof_packets + ' pacchetti scartati';
+  $('flows').textContent = s.counters.flows_installed;
+  $('acl').textContent = s.counters.acl_drops + ' bloccati da ACL';
+  $('links').innerHTML = Object.entries(s.links).map(([name, l]) => {
+    const pct = Math.min(100, 100 * l.bps / l.capacity_bps);
+    return '<tr><td>' + esc(name) + '</td><td>' + (l.slice === 'upper' ? 'alta' : 'bassa') + '</td><td>' +
+      mbps(l.bps) + '</td><td><div class="bar ' + (l.slice === 'lower' ? 'low' : '') +
+      '"><i style="width:' + pct + '%"></i></div></td></tr>';
+  }).join('');
+  const fl = s.flows || [];
+  $('flows_tbl').innerHTML = fl.length ? fl.map(f =>
+    '<tr><td>' + esc(f.src) + ' &rarr; ' + esc(f.dst) + '</td><td>' + esc(f.proto) +
+    (f.dport ? '/' + f.dport : '') + '</td><td>' + esc(f.class) + '</td><td>' + esc(f.slice) +
+    '</td><td>' + esc(f.queue) + '</td><td>' + mbps(f.bps) + '</td><td>' + f.packets + '</td><td>' +
+    f.duration + ' s</td></tr>').join('')
+    : '<tr><td colspan="8" style="color:var(--mute)">nessun flusso</td></tr>';
+  if (s.events.length) {
+    $('events').innerHTML = s.events.slice(0, 12).map(e =>
+      '<tr><td>' + new Date(e.t * 1000).toLocaleTimeString() + '</td><td class="k-' + esc(e.kind) + '">' +
+      esc(e.kind) + '</td><td>' + esc(e.detail) + '</td></tr>').join('');
+  }
+  draw(s.history);
+}
+
+async function poll() {
+  try { last = await (await fetch('/api/state', {cache: 'no-store'})).json(); render(last); }
+  catch (e) { render({waiting: true}); }
+}
+window.addEventListener('resize', () => last && !last.waiting && draw(last.history));
+poll(); setInterval(poll, 1000);
+</script>
+</body>
+</html>

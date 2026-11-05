@@ -1,0 +1,16 @@
+OFPST_FLOW reply (OF1.3) (xid=0x2):
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=1,dl_src=00:00:00:00:00:03,dl_dst=00:00:00:00:00:01,nw_src=10.0.0.3 actions=set_queue:2,output:4
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=1,dl_src=00:00:00:00:00:03,dl_dst=00:00:00:00:00:02,nw_src=10.0.0.3 actions=set_queue:2,output:4
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=1,dl_src=00:00:00:00:00:03,dl_dst=00:00:00:00:00:04,nw_src=10.0.0.3 actions=output:2
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=2,dl_src=00:00:00:00:00:04,dl_dst=00:00:00:00:00:01,nw_src=10.0.0.4 actions=set_queue:2,output:4
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=2,dl_src=00:00:00:00:00:04,dl_dst=00:00:00:00:00:02,nw_src=10.0.0.4 actions=set_queue:2,output:4
+ cookie=0x4, duration=54.573s, table=0, n_packets=4, n_bytes=392, priority=60,icmp,in_port=2,dl_src=00:00:00:00:00:04,dl_dst=00:00:00:00:00:03,nw_src=10.0.0.4 actions=output:1
+ cookie=0x2, duration=25.154s, table=0, n_packets=318, n_bytes=2408876, idle_timeout=10, priority=10,tcp,in_port=4,dl_src=00:00:00:00:00:02,dl_dst=00:00:00:00:00:04,tp_dst=5001 actions=output:2
+ cookie=0x2, duration=25.144s, table=0, n_packets=143, n_bytes=9466, idle_timeout=10, priority=10,tcp,in_port=2,dl_src=00:00:00:00:00:04,dl_dst=00:00:00:00:00:02,tp_dst=54418 actions=set_queue:2,output:4
+ cookie=0x1, duration=3.971s, table=0, n_packets=2547, n_bytes=3851064, idle_timeout=10, priority=10,udp,in_port=3,dl_src=00:00:00:00:00:01,dl_dst=00:00:00:00:00:03,tp_dst=9999 actions=output:1
+ cookie=0x2, duration=3.971s, table=0, n_packets=143, n_bytes=9466, idle_timeout=10, priority=10,tcp,in_port=2,dl_src=00:00:00:00:00:04,dl_dst=00:00:00:00:00:02,tp_dst=50560 actions=set_queue:2,output:4
+ cookie=0x4, duration=54.576s, table=0, n_packets=2, n_bytes=3024, priority=5,in_port=3,dl_dst=00:00:00:00:00:03 actions=output:1
+ cookie=0x4, duration=54.573s, table=0, n_packets=8, n_bytes=784, priority=5,in_port=4,dl_dst=00:00:00:00:00:03 actions=output:1
+ cookie=0x4, duration=54.573s, table=0, n_packets=0, n_bytes=0, priority=5,in_port=3,dl_dst=00:00:00:00:00:04 actions=output:2
+ cookie=0x4, duration=54.573s, table=0, n_packets=8, n_bytes=784, priority=5,in_port=4,dl_dst=00:00:00:00:00:04 actions=output:2
+ cookie=0x0, duration=54.576s, table=0, n_packets=109, n_bytes=12814, priority=0 actions=CONTROLLER:65535

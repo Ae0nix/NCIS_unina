@@ -1,0 +1,21 @@
+== modalita': topology ==
+Raggiungibilita' (ping):
+  h1 -> h2 : bloccato  atteso: vietato  
+  h1 -> h3 : raggiungibile atteso: ok  
+  h1 -> h4 : bloccato  atteso: vietato  
+  h2 -> h1 : bloccato  atteso: vietato  
+  h2 -> h3 : bloccato  atteso: vietato  
+  h2 -> h4 : raggiungibile atteso: ok  
+  h3 -> h1 : raggiungibile atteso: ok  
+  h3 -> h2 : bloccato  atteso: vietato  
+  h3 -> h4 : bloccato  atteso: vietato  
+  h4 -> h1 : bloccato  atteso: vietato  
+  h4 -> h2 : raggiungibile atteso: ok  
+  h4 -> h3 : bloccato  atteso: vietato  
+Percorso h1-h3: pacchetti entrati in s2=8, in s3=0  (atteso slice ALTA (s2))
+Percorso h2-h4: pacchetti entrati in s2=0, in s3=8  (atteso slice BASSA (s3))
+Verifica con tcpdump (file tcpdump_*.txt):
+  ping h1->h3: echo request visti su s2-eth1 = 5, su s3-eth1 = 0  (atteso: solo s2 (slice alta))
+  ping h2->h4: echo request visti su s2-eth1 = 0, su s3-eth1 = 5  (atteso: solo s3 (slice bassa))
+Regole di tutti gli switch salvate in flows_s1..s4.txt
+ESITO: ok
