@@ -159,7 +159,7 @@ I parametri operativi principali sono definiti all'interno della classe `FinalST
 Per ispezionare in tempo reale la Flow Table installata dal controller sullo switch `s1` (verificando i contatori dei pacchetti, i drop di slicing a priorità `80` e le regole QoS a priorità `20` e `10`):
 
 ```bash
-ovs-ofctl dump-flows s1
+sh ovs-ofctl dump-flows s1
 
 ```
 
