@@ -62,50 +62,68 @@ Per evitare broadcast storm sull'anello `s1-s2-s3`, il controller integra la lib
 
 ### 2.2 Istruzioni di esecuzione (Quickstart)
 
-**1. Avviare il controller Ryu** (Terminale 1):
+Aprire due finestre del terminale ed eseguire i seguenti comandi:
+
+**1. Avviare il controller Ryu (Terminale 1):**
 
 ```bash
-python3 -m ryu.cmd.manager /workspace/controller_slicing.py
+docker start ambiente_sdn
+docker exec -it ambiente_sdn bash
+ryu-manager /workspace/controller_slicing.py
 
 ```
 
-**2. Avviare la topologia in Mininet** (Terminale 2):
+*(Lasciare questa finestra in attesa dopo l'avvio dell'app).*
+
+**2. Entrare in Docker e pulire Mininet (Terminale 2):**
+È fondamentale eseguire sempre il comando di pulizia prima di avviare la topologia, per svuotare le regole virtuali residue.
+
+```bash
+docker exec -it ambiente_sdn bash
+mn -c
+
+```
+
+**3. Avviare la topologia in Mininet (Terminale 2):**
 
 ```bash
 mn --custom /workspace/topology_slicing.py --topo slicingtopo --switch ovs,datapath=user --controller=remote,ip=127.0.0.1,port=6633 --mac
 
 ```
 
-**3. Eseguire i test di validazione dalla CLI di Mininet**:
+*(Attenzione: attendere circa 10-15 secondi che i log dell'STP nel Terminale 1 si stabilizzino e terminino prima di lanciare i comandi di test).*
 
-* **Test di Isolamento Slicing (Tenant A verso Tenant B - Bloccato al 100%)**:
+**4. Eseguire i test di validazione dalla CLI di Mininet (Terminale 2):**
 
-```bash
+* **Test di Connettività Base e Slicing (Tenant A vs Tenant B - Bloccato al 100%)**:
+
+```text
+mininet> pingall
 mininet> h1 ping -c 6 -i 0.1 h4
 
 ```
 
+*(Nel pingall alcuni host risulteranno irraggiungibili (X) per via dell'isolamento. Il ping h1-h4 darà Destination Host Unreachable).*
+
 * **Test di Confine e Flood DoS (Attivazione Ban Esponenziale 15s -> 30s)**:
+Osservare il Terminale 1 mentre si lancia l'attacco.
 
-```bash
-mininet> h1 ping -c 75 -i 0.1 h3
-
-```
-
-```bash
+```text
 mininet> h1 ping -c 400 -i 0.1 h3
 
 ```
 
+*(Nel Terminale 1 appariranno i log di blocco per Infrazione #1).*
+
 * **Test di Resilienza STP e Failover (Simulazione rottura e ripristino link fisico)**:
 
-```bash
-mininet> h1 ping h3 &
+```text
 mininet> link s1 s2 down
-mininet> link s1 s2 up
-mininet> pkill -9 ping
+mininet> pingall
 
 ```
+
+*(Il traffico continuerà a scorrere attraverso il percorso di riserva su s3 abilitato dall'STP).*
 
 ---
 
@@ -157,11 +175,3 @@ mn -c
 ```
 
 * **Connessione Controller-Switch**: Avviare sempre il controller Ryu *prima* di lanciare il comando `mn` e assicurarsi che la porta specificata (`6633`) coincida con quella in ascolto sul controller.
-
-```
-
-```
-
-
-
-
