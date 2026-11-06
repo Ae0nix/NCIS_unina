@@ -67,8 +67,8 @@ Aprire due finestre del terminale ed eseguire i seguenti comandi:
 **1. Avviare il controller Ryu (Terminale 1):**
 
 ```bash
-docker start ambiente_sdn
 docker exec -it ambiente_sdn bash
+pkill -9 -f ryu-manager
 ryu-manager /workspace/controller_slicing.py
 
 ```
