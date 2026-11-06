@@ -1,0 +1,11 @@
+services:
+  netlab:
+    build: .
+    container_name: mininet_ryu_lab
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: /bin/bash
