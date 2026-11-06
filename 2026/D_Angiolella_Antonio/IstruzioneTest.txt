@@ -1,0 +1,17 @@
+FASE 1: PREPARAZIONE
+Assicurarsi di avere i file topology.py e Controller_RYU.py nella stessa cartella su Ubuntu. L'ambiente deve avere Mininet, Ryu e hping3 installati.   
+
+FASE 2: AVVIO DEL CONTROLLER
+Aprire il primo terminale ed avviare il controller Ryu digitando: ryu-manager Controller_RYU.py. Il controller si mette in ascolto per gestire le regole di inoltro dello switch.   
+
+FASE 3: AVVIO DELLA RETE MININET
+Aprire un secondo terminale ed eseguire lo script della rete con: sudo python3 topology.py. Viene creata una rete a stella con uno switch virtuale OpenFlow e 5 host. Per verificare il funzionamento iniziale, scrivere pingall nella CLI di Mininet per confermare che tutti gli host riescono a comunicare tra loro.   
+
+FASE 4: SIMULAZIONE DELL ATTACCO DOS
+Sempre dalla CLI di Mininet, avviare l'attacco TCP SYN Flood dall'host h1 verso la vittima h2 digitando: h1 hping3 --flood 10.0.0.2.   
+
+FASE 5: RILEVAMENTO E BLOCCO
+Nel primo terminale, dove gira il controller Ryu, apparirà un avviso che segnala il superamento della soglia di pacchetti consentita. Il controller applica automaticamente una regola per scartare il traffico proveniente dall'IP dell'attaccante.   
+
+FASE 6: VERIFICA DELL ISOLAMENTO
+Premere CTRL+C nel terminale di Mininet per fermare l'attacco. Digitare nuovamente pingall. Il test mostrerà che l'host h1 è stato completamente isolato dalla rete, mentre gli altri host continuano a comunicare normalmente senza problemi.   
