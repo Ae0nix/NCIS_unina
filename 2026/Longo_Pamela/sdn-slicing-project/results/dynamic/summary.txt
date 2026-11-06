@@ -1,0 +1,10 @@
+== modalita': dynamic ==
+TCP normale  prima del video : 9.55 Mbps  (atteso ~ 9-10: usa la slice alta)
+TCP normale  durante il video: 0.84 Mbps  (atteso ~ 1: torna sulla slice bassa)
+TCP normale  dopo il video   : 8.19 Mbps  (atteso ~ 9-10: riprende la slice alta)
+Video (UDP 8 Mbps) durante   : 8.41 Mbps  (atteso ~ 8)
+  TCP prima del video usa la slice alta (>= 4 Mbps)            ok
+  TCP durante il video torna sulla slice bassa (<= 2 Mbps)     ok
+  video vicino agli 8 Mbps offerti (>= 7 Mbps)                 ok
+  (dopo il video il TCP puo' recuperare piu' lentamente: la coda della slice bassa si svuota)
+ESITO: ok

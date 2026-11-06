@@ -1,0 +1,23 @@
+------------------------------------------------------------
+Client connecting to 10.0.0.3, UDP port 9999
+Sending 1470 byte datagrams, IPG target: 1401.90 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.1 port 39750 connected with 10.0.0.3 port 9999
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-1.0000 sec  1.00 MBytes  8.41 Mbits/sec
+[  1] 1.0000-2.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 2.0000-3.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 3.0000-4.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 4.0000-5.0000 sec  1.00 MBytes  8.40 Mbits/sec
+[  1] 5.0000-6.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 6.0000-7.0000 sec  1.00 MBytes  8.40 Mbits/sec
+[  1] 7.0000-8.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 8.0000-9.0000 sec  1024 KBytes  8.38 Mbits/sec
+[  1] 9.0000-10.0000 sec  1022 KBytes  8.37 Mbits/sec
+[  1] 0.0000-10.0007 sec  10.0 MBytes  8.39 Mbits/sec
+[  1] Sent 7136 datagrams
+[  1] Server Report:
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  1] 0.0000-10.0311 sec  10.0 MBytes  8.36 Mbits/sec   0.849 ms 0/7135 (0%)
+[  1] 0.0000-10.0311 sec  43 datagrams received out-of-order
