@@ -23,6 +23,8 @@ Progetto che implementa, su una rete SDN emulata con **Mininet** e controllata d
 
 ## 1. Architettura Teorica e Moduli del Sistema
 
+![Topologia di Rete SDN](topology_slicing.png)
+
 ### 1.1 Topologia ad Anello e Isolamento Tenant (Slicing)
 L'infrastruttura (`topology_slicing.py`) è composta da **3 Switch OpenFlow** (`s1`, `s2`, `s3`) interconnessi in una topologia ad anello ridondante e **4 Host** suddivisi in due slice isolate:
 * **Tenant A (Slice A)**: `h1` (`10.0.0.1`) e `h3` (`10.0.0.3`)
